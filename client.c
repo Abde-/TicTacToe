@@ -9,3 +9,7 @@
 #include <sys/socket.h>
 
 #define PORT 5555
+
+int main(int argc, char *argv[]){
+	
+}
