@@ -13,10 +13,14 @@
 #define PORT 5555
 #define BACKLOG 0 //no limit in connections
 
+void sigchld_handler(int s){
+    while(wait(NULL) > 0);
+}
+
 int main(void){
-	int sockfd, con_fd; //listening socket and new connection socket
+	int sockfd, new_fd; //listening socket and new connection socket
 	struct sockaddr_in my_addr;    // my address
-    struct sockaddr_in connect_addr; // connector's address information
+    struct sockaddr_in their_addr; // connector's address information
 	socklen_t sin_size;
     struct sigaction sa;
     int yes = 1;
@@ -61,8 +65,16 @@ int main(void){
     }
 
     while(1){ // main accept loop, when accept -> fork
+        sin_size = sizeof(struct sockaddr_in);
+        if ((new_fd = accept(sockfd, (struct sockaddr *)&their_addr, &sin_size)) == -1) {
+            perror("accept");
+            continue;
+        }
+        printf("server: got connection from %s\n",inet_ntoa(their_addr.sin_addr));
+        if (!fork()) { // this is the child process for each client
 
-
+        }
 
     }
+
 }
