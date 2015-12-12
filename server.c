@@ -39,5 +39,30 @@ int main(void){
     my_addr.sin_addr.s_addr = INADDR_ANY; // automatically fill with my IP
     memset(&(my_addr.sin_zero), '\0', 8); // zero the rest of the struct
 
+    // bind socket to port
+    if (bind(sockfd, (struct sockaddr *)&my_addr, sizeof(struct sockaddr)) == -1) {
+        perror("bind");
+        exit(1);
+    }
 
+    // listen par le socket bindé
+    if (listen(sockfd, BACKLOG) == -1) {
+        perror("listen");
+        exit(1);
+    }
+
+    // clean-up of dead child processes
+    sa.sa_handler = sigchld_handler;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = SA_RESTART;
+    if (sigaction(SIGCHLD, &sa, NULL) == -1) {
+        perror("sigaction");
+        exit(1);
+    }
+
+    while(1){ // main accept loop, when accept -> fork
+
+
+
+    }
 }
