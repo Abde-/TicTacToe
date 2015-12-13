@@ -62,10 +62,22 @@ int main(int argc, char *argv[]){
 
 
     while(buf[0] != '0'){
-    	scanf("%s",&buf); //replace this by 2 scanf, pour coordonnées
+    	printf("Introduire coordonnée y: ");
+    	scanf("%c",&buf[0]); //replace this by 2 scanf, pour coordonnées
+    	while (buf[0] != '0' && buf[0] != '1' && buf[0] != '2') {
+    		printf("Introduire coordonnée y: ");
+    		scanf("%c",&buf[0]);
+    	}
 
+    	printf("Introduire coordonnée x: ");
+    	scanf("%c",&buf[1]); //replace this by 2 scanf, pour coordonnées
+    	while (buf[1] != '0' && buf[1] != '1' && buf[1] != '2') {
+    		printf("Introduire coordonnée x: ");
+    		scanf("%c",&buf[1]);
+    	}
+
+    	// envoi coordonnées
     	if (send(sockfd, buf, 2, 0) == -1) perror("send");
-
     	if ((numbytes=recv(sockfd, buf, MAXDATASIZE-1, 0)) == -1)perror("recv");
 
     	buf[numbytes] = '\0';
@@ -76,6 +88,7 @@ int main(int argc, char *argv[]){
     		if (i % 3 == 2) printf("\n");
     	}
 
+    	// afichage message
     	printf("%s",buf[LENGTH+1])
     }
 
