@@ -62,7 +62,7 @@ int main(int argc, char *argv[]){
 
 
     while(buf[0] != '0'){
-    	scanf("%s",&buf);
+    	scanf("%s",&buf); //replace this by 2 scanf, pour coordonnées
 
     	if (send(sockfd, buf, 2, 0) == -1) perror("send");
 
