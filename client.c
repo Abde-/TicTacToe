@@ -12,10 +12,24 @@
 #define MAXDATASIZE 100
 #define LENGTH 9
 
+void printGrid(char v[]){
+	for(int i = 0; i < LENGTH; ++i){
+    	printf("%c",v[i+1]);
+    	if (i % 3 == 2) printf("%d\n",i/3);
+    }
+    for(int i = 0; i < 3; ++i) printf("%d",i);
+    printf("\n");
+}
+
 int main(int argc, char *argv[]){
     int sockfd, numbytes;  
     char buf[MAXDATASIZE];
-    char send[MAXDATASIZE];
+    char inp;
+    int temp; 
+
+    const char *messages[3] = { "La partie continue:\n", "Vous avez gagné!\n","Vous avez perdu!\n" };
+    
+    char message[MAXDATASIZE];
     struct hostent *he;
     struct sockaddr_in their_addr; // connector's address information 
 
@@ -40,7 +54,7 @@ int main(int argc, char *argv[]){
     memset(&(their_addr.sin_zero), '\0', 8);  // zero the rest of the struct 
 
     if (connect(sockfd, (struct sockaddr *)&their_addr, sizeof(struct sockaddr)) == -1) {
-        perror("Cannot connect to game server.");
+        perror("Cannot connect to game server");
         exit(1);
     }
 
@@ -52,7 +66,7 @@ int main(int argc, char *argv[]){
     buf[numbytes] = '\0';
     printf("%s",buf);
 
-    scanf("%s", &buf);
+    scanf(" %c", &buf);
     if (send(sockfd, buf, 1, 0) == -1) perror("send");
 
     if ((numbytes=recv(sockfd, buf, MAXDATASIZE-1, 0)) == -1) {
@@ -60,37 +74,33 @@ int main(int argc, char *argv[]){
     	exit(1);
     }
 
+    buf[numbytes] = '\0';
 
-    while(buf[0] != '0'){
-    	printf("Introduire coordonnée y: ");
-    	scanf("%c",&buf[0]); //replace this by 2 scanf, pour coordonnées
-    	while (buf[0] != '0' && buf[0] != '1' && buf[0] != '2') {
-    		printf("Introduire coordonnée y: ");
-    		scanf("%c",&buf[0]);
+    buf[0] = '0';
+
+    while(buf[0] == '0'){
+
+    	printGrid(buf);
+    	printf("%s",buf+LENGTH+1);
+
+    	printf("coordonnée y: ");
+    	scanf("%d",&temp); // y
+    	inp = '0' + (temp*3);
+
+    	printf("coordonnée x: ");
+    	scanf("%d",&temp); // x
+    	inp += temp;
+
+    	if (send(sockfd, &inp, 1, 0) == -1) perror("send");
+    	if ((numbytes=recv(sockfd, buf, MAXDATASIZE-1, 0)) == -1){
+    		perror("recv");
     	}
-
-    	printf("Introduire coordonnée x: ");
-    	scanf("%c",&buf[1]); //replace this by 2 scanf, pour coordonnées
-    	while (buf[1] != '0' && buf[1] != '1' && buf[1] != '2') {
-    		printf("Introduire coordonnée x: ");
-    		scanf("%c",&buf[1]);
-    	}
-
-    	// envoi coordonnées
-    	if (send(sockfd, buf, 2, 0) == -1) perror("send");
-    	if ((numbytes=recv(sockfd, buf, MAXDATASIZE-1, 0)) == -1)perror("recv");
-
     	buf[numbytes] = '\0';
-
-    	// affichage colonne
-    	for(int i = 0; i < LENGTH; ++i){
-    		printf("%c",buf[i+1]);
-    		if (i % 3 == 2) printf("\n");
-    	}
-
-    	// afichage message
-    	printf("%s",buf[LENGTH+1])
     }
+
+    //affichage grid et resultat final
+    printGrid(buf);
+    printf("%s",buf+LENGTH+1);
 
     close(sockfd);
 
