@@ -13,11 +13,12 @@
 #define LENGTH 9
 
 void printGrid(char v[]){
-	for(int i = 0; i < LENGTH; ++i){
+	int i;
+    for(i = 0; i < LENGTH; ++i){
     	printf("%c",v[i+1]);
     	if (i % 3 == 2) printf("%d\n",i/3);
     }
-    for(int i = 0; i < 3; ++i) printf("%d",i);
+    for(i = 0; i < 3; ++i) printf("%d",i);
     printf("\n");
 }
 
@@ -66,7 +67,7 @@ int main(int argc, char *argv[]){
     buf[numbytes] = '\0';
     printf("%s",buf);
 
-    scanf(" %c", &buf);
+    scanf("%c", &buf);
     if (send(sockfd, buf, 1, 0) == -1) perror("send");
 
     if ((numbytes=recv(sockfd, buf, MAXDATASIZE-1, 0)) == -1) {
@@ -83,6 +84,7 @@ int main(int argc, char *argv[]){
     	printGrid(buf);
     	printf("%s",buf+LENGTH+1);
 
+        // TODO: vérification que x et y sortent pas des bornes
     	printf("coordonnée y: ");
     	scanf("%d",&temp); // y
     	inp = '0' + (temp*3);
@@ -90,6 +92,7 @@ int main(int argc, char *argv[]){
     	printf("coordonnée x: ");
     	scanf("%d",&temp); // x
     	inp += temp;
+        printf("\n");
 
     	if (send(sockfd, &inp, 1, 0) == -1) perror("send");
     	if ((numbytes=recv(sockfd, buf, MAXDATASIZE-1, 0)) == -1){

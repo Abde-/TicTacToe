@@ -26,6 +26,45 @@ void sigchld_handler(int s){
     while(wait(NULL) > 0);
 }
 
+int isWinner(char grid[],char player[]){
+    int res = 0, i = 0;
+    printf("%s",grid);
+    // horizontal
+    while (res == 0 && i < 3){        
+        if ( grid[i*3] == player[0] && grid[i*3] == grid[i*3+1] && grid[i*3+1] == grid[i*3+2])
+            res = 1;
+        i += 1;
+    }
+
+    i=0;
+    //vertical
+    while (res == 0 && i < 3){        
+        if (grid[3+i] == player[0] && grid[0+i] == grid[3+i] && grid[3+i] == grid[6+i])
+            res = 1;
+        i += 1;
+    }
+
+    //diagonal1        
+    if ( res == 0 && grid[0] == player[0] && grid[0] == grid[4] && grid[4] == grid[8] )
+        res = 1;
+
+    //diagonal2
+    if ( res == 0 && grid[2] == player[0] && grid[2] == grid[4] && grid[4] == grid[6] )
+        res = 1;
+    printf("win? %d\n",res);
+    return res;
+}
+
+int isFull(char grid[]){
+    int i,res = 1;
+    while( res == 1 && i < LENGTH){ 
+        if (grid[i] == ' ')
+            res = 0;
+    }
+    return res;
+}
+
+
 int main(void){
     
 	int sockfd, new_fd; //listening socket and new connection socket
@@ -101,7 +140,8 @@ int main(void){
                 char grid[LENGTH]; //grid for game, if O -> server, X -> user, 0 -> empty
                 int finish = 0;
 
-                for (int i = 0; i < LENGTH; ++i)
+                int i;
+                for (i = 0; i < LENGTH; ++i)
                     grid[i] = ' ';
                 char choice = '0';
 
@@ -116,7 +156,7 @@ int main(void){
                 
                 char ending[1] = "0";
                 // boucle du jeu
-                while (ending == "0"){
+                while (ending[0] == '0'){
 
                     printf("testbuff\n");
                     if ((recv(new_fd, buffer, 1, 0)) == -1) {
@@ -129,49 +169,76 @@ int main(void){
                     
                     grid[choice] = 'O';
                     // verifier grille
-
-                    //srand(time(NULL)); 
-                    random = rand() % LENGTH; // random
-
-                    while (grid[random] != ' '){
-                        random = rand() % LENGTH;
-                    }
-                    grid[random] = 'X';
-                    // vérifier grille
-
-                    if (send(new_fd, ending, 1, 0) == -1){
-                        perror("send");
-                        exit(1);
-                    }
-
-                    if (send(new_fd, grid, LENGTH, 0) == -1) {
-                        perror("send");
-                        exit(1);
-                    }
                     
-                    if (ending == "0"){
-                        if (send(new_fd, "La partie continue:\n", 20, 0) == -1){
+                    if (isWinner(grid,"O")){
+                        ending[0] = '1';
+                    }
+                    //else if (isFull(grid)){
+                    //    ending[0] = '2';
+                    //}
+
+                    if (ending[0] == '0'){
+                        printf("works?\n");
+                        random = rand() % LENGTH; // random
+
+                        while (grid[random] != ' '){
+                            random = rand() % LENGTH;
+                        }
+                        grid[random] = 'X';
+                        // vérifier grille
+
+                        if (send(new_fd, ending, 1, 0) == -1){
                             perror("send");
                             exit(1);
                         }
+
+                        if (send(new_fd, grid, LENGTH, 0) == -1) {
+                            perror("send");
+                            exit(1);
+                        }
+                    
+                        if (ending[0] == '0'){
+                            if (send(new_fd, "La partie continue:\n", 20, 0) == -1){
+                                perror("send");
+                                exit(1);
+                            }
+                        }
                     }
-               
                 }
 
-                if (ending == "1"){
-                    if (send(new_fd, "La partie continue:\n", 20, 0) == -1){
-                        perror("send");
-                        exit(1);
+                if (send(new_fd, ending, 1, 0) == -1) perror("send");
+                if (send(new_fd, grid, LENGTH, 0) == -1) perror("send");
+
+
+                switch (ending[0]){
+                    case '1':
+                        if (send(new_fd, "Le joueur gagne!\n", 17, 0) == -1){
+                            perror("send");
+                            exit(1);
+                        }
+                        break;
+
+                    case '2':
+                        if (send(new_fd, "Le serveur gagne!\n", 18, 0) == -1){
+                            perror("send");
+                            exit(1);
+                        }
+                        break;
+
+                    case '3':
+                        if (send(new_fd, "Match nul!\n", 11, 0) == -1){
+                            perror("send");
+                            exit(1);
+                        }
+                        break;                
                 }
-            
+
             }
             exit(0);
+        
         }
-
             close(new_fd);  // parent doesn't need this
         }
 
     return 0;
-
-    }
 }
