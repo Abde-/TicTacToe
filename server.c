@@ -56,11 +56,13 @@ int isWinner(char grid[],char player[]){
 }
 
 int isFull(char grid[]){
-    int i,res = 1;
+    int i=0,res = 1;
     while( res == 1 && i < LENGTH){ 
         if (grid[i] == ' ')
             res = 0;
+        i += 1;
     }
+    printf("full?%d\n",res);
     return res;
 }
 
@@ -73,6 +75,8 @@ int main(void){
 	socklen_t sin_size;
     struct sigaction sa;
     int yes = 1;
+    char grid[LENGTH]; //grid for game, if O -> server, X -> user, 0 -> empty
+    char ending[1]; // variable qui définit la fin
 
     // initialization of listening socket
     if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
@@ -136,14 +140,9 @@ int main(void){
             }
 
             if(buffer[0] == '1'){ //si choisit jouer
-
-                char grid[LENGTH]; //grid for game, if O -> server, X -> user, 0 -> empty
-                int finish = 0;
-
                 int i;
                 for (i = 0; i < LENGTH; ++i)
                     grid[i] = ' ';
-                char choice = '0';
 
                 srand(time(NULL)); 
                 int random = rand() % LENGTH; // random
@@ -154,91 +153,73 @@ int main(void){
                 if (send(new_fd, "La partie commence:\n", 20, 0) == -1) perror("send");
                 printf("test\n");
                 
-                char ending[1] = "0";
+                ending[0] = '0';
                 // boucle du jeu
                 while (ending[0] == '0'){
+                    printf("testttt\n");
 
-                    printf("testbuff\n");
                     if ((recv(new_fd, buffer, 1, 0)) == -1) {
                         perror("recv");
                     }
 
-                    // il saute tout?
-                    choice = buffer[0]-'0';
-                    printf("choice: %i\n",choice);
-                    
-                    grid[choice] = 'O';
-                    // verifier grille
-                    
-                    if (isWinner(grid,"O")){
+                    choice = buffer[0] - '0';
+                    printf("%s\n",buffer);
+
+                    grid[choice] = 'X'; 
+                    if (isWinner(grid,"X")){
                         ending[0] = '1';
                     }
-                    //else if (isFull(grid)){
-                    //    ending[0] = '2';
+
+                    //else if(isFull(grid)){
+                    //    ending[0] = '3';
                     //}
 
-                    if (ending[0] == '0'){
-                        printf("works?\n");
-                        random = rand() % LENGTH; // random
-
-                        while (grid[random] != ' '){
-                            random = rand() % LENGTH;
-                        }
-                        grid[random] = 'X';
-                        // vérifier grille
-
-                        if (send(new_fd, ending, 1, 0) == -1){
-                            perror("send");
-                            exit(1);
-                        }
-
-                        if (send(new_fd, grid, LENGTH, 0) == -1) {
-                            perror("send");
-                            exit(1);
-                        }
-                    
-                        if (ending[0] == '0'){
-                            if (send(new_fd, "La partie continue:\n", 20, 0) == -1){
+                    if (send(new_fd, ending, 1, 0) == -1) perror("send");
+                    if (send(new_fd, grid, LENGTH, 0) == -1) perror("send");
+                    switch (ending[0]){
+                        case '0':
+                            if (send(new_fd, "La partie continue:\n", 19, 0) == -1){
                                 perror("send");
                                 exit(1);
                             }
-                        }
+                            break;
+
+                        case '1':
+                            if (send(new_fd, "Le joueur gagne!\n", 17, 0) == -1){
+                                perror("send");
+                                exit(1);
+                            }
+                            break;
+
+                        case '2':
+                            if (send(new_fd, "Le serveur gagne!\n", 18, 0) == -1){
+                                perror("send");
+                                exit(1);
+                            }
+                            break;
+
+                        case '3':
+                            if (send(new_fd, "Match nul!\n", 11, 0) == -1){
+                                perror("send");
+                                exit(1);
+                            }
+                            break;                
+
+                        case '4':
+                            if (send(new_fd, "Introduisez bonne valeur\n", 25, 0) == -1){
+                                perror("send");
+                                exit(1);
+                            }
+                            break;                
                     }
+                
                 }
-
-                if (send(new_fd, ending, 1, 0) == -1) perror("send");
-                if (send(new_fd, grid, LENGTH, 0) == -1) perror("send");
-
-
-                switch (ending[0]){
-                    case '1':
-                        if (send(new_fd, "Le joueur gagne!\n", 17, 0) == -1){
-                            perror("send");
-                            exit(1);
-                        }
-                        break;
-
-                    case '2':
-                        if (send(new_fd, "Le serveur gagne!\n", 18, 0) == -1){
-                            perror("send");
-                            exit(1);
-                        }
-                        break;
-
-                    case '3':
-                        if (send(new_fd, "Match nul!\n", 11, 0) == -1){
-                            perror("send");
-                            exit(1);
-                        }
-                        break;                
-                }
-
             }
             exit(0);
         
         }
-            close(new_fd);  // parent doesn't need this
-        }
+        close(new_fd);  // parent doesn't need this
+    }
 
     return 0;
 }

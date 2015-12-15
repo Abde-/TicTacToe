@@ -85,6 +85,7 @@ int main(int argc, char *argv[]){
     	printf("%s",buf+LENGTH+1);
 
         // TODO: vérification que x et y sortent pas des bornes
+        
     	printf("coordonnée y: ");
     	scanf("%d",&temp); // y
     	inp = '0' + (temp*3);
