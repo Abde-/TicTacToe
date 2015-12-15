@@ -79,13 +79,13 @@ int main(int argc, char *argv[]){
 
     buf[0] = '0';
 
-    while(buf[0] == '0'){
+    while(buf[0] == '0' || buf[0] == '4'){
 
     	printGrid(buf);
     	printf("%s",buf+LENGTH+1);
 
         // TODO: vérification que x et y sortent pas des bornes
-        
+
     	printf("coordonnée y: ");
     	scanf("%d",&temp); // y
     	inp = '0' + (temp*3);

@@ -146,7 +146,7 @@ int main(void){
 
                 srand(time(NULL)); 
                 int random = rand() % LENGTH; // random
-                grid[random] = 'X';
+                grid[random] = 'O';
 
                 if (send(new_fd, "0", 1, 0) == -1) perror("send");
                 if (send(new_fd, grid, LENGTH, 0) == -1) perror("send");
@@ -164,21 +164,44 @@ int main(void){
 
                     choice = buffer[0] - '0';
                     printf("%s\n",buffer);
-
-                    grid[choice] = 'X'; 
-                    if (isWinner(grid,"X")){
-                        ending[0] = '1';
+                    
+                    if (grid[choice] == ' '){
+                        grid[choice] = 'X';
+                    }
+                    else{
+                        ending[0] = '4';
+                    }
+                    
+                    if(ending[0] == '0'){
+                        if (isWinner(grid,"X")){
+                            ending[0] = '1';
+                        }
+                        else if(isFull(grid)){
+                            ending[0] = '3';
+                        }
                     }
 
-                    //else if(isFull(grid)){
-                    //    ending[0] = '3';
-                    //}
+                    if(ending[0] == '0'){
+                        random = rand() % LENGTH;
+                        while(grid[random] != ' '){
+                            random = rand() % LENGTH;
+                        }
+                        grid[random] = 'O';
+                        
+                        if (isWinner(grid,"O")){
+                            ending[0] = '2';
+                        }
+                        else if(isFull(grid)){
+                            ending[0] = '3';
+                        }
+                    }
 
+                    printf("%c",ending[0]);
                     if (send(new_fd, ending, 1, 0) == -1) perror("send");
                     if (send(new_fd, grid, LENGTH, 0) == -1) perror("send");
                     switch (ending[0]){
                         case '0':
-                            if (send(new_fd, "La partie continue:\n", 19, 0) == -1){
+                            if (send(new_fd, "La partie continue:\n", 20, 0) == -1){
                                 perror("send");
                                 exit(1);
                             }
@@ -210,6 +233,7 @@ int main(void){
                                 perror("send");
                                 exit(1);
                             }
+                            ending[0] = '0';
                             break;                
                     }
                 
