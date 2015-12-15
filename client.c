@@ -79,6 +79,7 @@ int main(int argc, char *argv[]){
 
     buf[0] = '0';
 
+    // partie se finit ssi cas 1,2,3 du ending dans server
     while(buf[0] == '0' || buf[0] == '4'){
 
     	printGrid(buf);
@@ -87,14 +88,14 @@ int main(int argc, char *argv[]){
         // TODO: vérification que x et y sortent pas des bornes
         temp = -1;
         while(temp > 2 || temp < 0){
-            printf("coordonnée y: ");
+            printf("Coordonnée y: ");
             scanf("%d",&temp); // y
         }
         inp = '0' + (temp*3);
         
         temp = -1;
         while(temp > 2 || temp < 0){
-            printf("coordonnée x: ");
+            printf("Coordonnée x: ");
             scanf("%d",&temp); // x
         }
         inp += temp;

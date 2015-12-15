@@ -27,8 +27,9 @@ void sigchld_handler(int s){
 }
 
 int isWinner(char grid[],char player[]){
+    // fonction qui vérifie que player[0] est winner dans grid
+
     int res = 0, i = 0;
-    printf("%s",grid);
     // horizontal
     while (res == 0 && i < 3){        
         if ( grid[i*3] == player[0] && grid[i*3] == grid[i*3+1] && grid[i*3+1] == grid[i*3+2])
@@ -51,18 +52,18 @@ int isWinner(char grid[],char player[]){
     //diagonal2
     if ( res == 0 && grid[2] == player[0] && grid[2] == grid[4] && grid[4] == grid[6] )
         res = 1;
-    printf("win? %d\n",res);
     return res;
 }
 
 int isFull(char grid[]){
+    // fonction qui vérifie si grille remplie
+
     int i=0,res = 1;
     while( res == 1 && i < LENGTH){ 
         if (grid[i] == ' ')
             res = 0;
         i += 1;
     }
-    printf("full?%d\n",res);
     return res;
 }
 
@@ -124,7 +125,6 @@ int main(void){
             continue;
         }
         printf("server: got connection from %s\n",inet_ntoa(their_addr.sin_addr));
-        printf("test1\n");
         
         if (!fork()) { // this is the child process for each client
             close(sockfd);
@@ -151,20 +151,19 @@ int main(void){
                 if (send(new_fd, "0", 1, 0) == -1) perror("send");
                 if (send(new_fd, grid, LENGTH, 0) == -1) perror("send");
                 if (send(new_fd, "La partie commence:\n", 20, 0) == -1) perror("send");
-                printf("test\n");
                 
                 ending[0] = '0';
                 // boucle du jeu
                 while (ending[0] == '0'){
-                    printf("testttt\n");
 
+                    // reception du choix dans la grille
                     if ((recv(new_fd, buffer, 1, 0)) == -1) {
                         perror("recv");
                     }
 
                     choice = buffer[0] - '0';
-                    printf("%s\n",buffer);
                     
+                    // vérification si win / égalité pour joueur
                     if (grid[choice] == ' '){
                         grid[choice] = 'X';
                     }
@@ -181,8 +180,9 @@ int main(void){
                         }
                     }
 
+                    // vérification si win / égalité pour machine
                     if(ending[0] == '0'){
-                        random = rand() % LENGTH;
+                        random = rand() % LENGTH; // random
                         while(grid[random] != ' '){
                             random = rand() % LENGTH;
                         }
@@ -196,7 +196,6 @@ int main(void){
                         }
                     }
 
-                    printf("%c",ending[0]);
                     if (send(new_fd, ending, 1, 0) == -1) perror("send");
                     if (send(new_fd, grid, LENGTH, 0) == -1) perror("send");
                     switch (ending[0]){
@@ -239,6 +238,7 @@ int main(void){
                 
                 }
             }
+            printf("connection with %s finished.\n",inet_ntoa(their_addr.sin_addr));
             exit(0);
         
         }
