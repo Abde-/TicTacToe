@@ -85,17 +85,23 @@ int main(int argc, char *argv[]){
     	printf("%s",buf+LENGTH+1);
 
         // TODO: vérification que x et y sortent pas des bornes
+        temp = -1;
+        while(temp > 2 || temp < 0){
+            printf("coordonnée y: ");
+            scanf("%d",&temp); // y
+        }
+        inp = '0' + (temp*3);
+        
+        temp = -1;
+        while(temp > 2 || temp < 0){
+            printf("coordonnée x: ");
+            scanf("%d",&temp); // x
+        }
+        inp += temp;
 
-    	printf("coordonnée y: ");
-    	scanf("%d",&temp); // y
-    	inp = '0' + (temp*3);
-
-    	printf("coordonnée x: ");
-    	scanf("%d",&temp); // x
-    	inp += temp;
-        printf("\n");
-
-    	if (send(sockfd, &inp, 1, 0) == -1) perror("send");
+        printf("\n");        
+    	
+        if (send(sockfd, &inp, 1, 0) == -1) perror("send");
     	if ((numbytes=recv(sockfd, buf, MAXDATASIZE-1, 0)) == -1){
     		perror("recv");
     	}
