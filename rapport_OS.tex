@@ -1,0 +1,46 @@
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[pdftex]{graphicx}
+\usepackage[T1]{fontenc}
+\usepackage[francais]{babel}
+\frenchbsetup{StandardLists=true}
+
+\title{Projet de INFO-F201 : \og TicTacToe\fg\\}
+\author{Abdeselam \bsc{El-Haman Abdeselam}\\\\Matricule: 000411426}
+\date{20 décembre 2015}
+
+\begin{document}
+
+\maketitle
+
+\section*{Architecture du programme}
+	Cette version de Tic-Tac-Toe en réseau utilise un protocole d'envoi de messages du serveur qui peuvent s'interpréter par le client tel que:
+
+\begin{itemize}
+	\item 1 bit de vérification
+	\item 9 bits représentant la grille 
+	\item (?) bits représentant le message personnalisé (ex. partie finie, etc)\\
+\end{itemize}	
+Par exemple:
+	\begin{verbatim}
+	0   X  O OLa partie continue
+	\end{verbatim}
+	Dont le 0 représente l'état du jeu (la partie n'est pas encore finie), la grille a 2 cases utilisées par le server et une par le joueur. Le message est <<La partie continue>>.\\
+	
+	Ce programme se compose de 2 executables, le client et le serveur, qui seront décrits ci-dessous.
+	
+\section*{Le client}
+	Après avoir connecté avec le serveur et que le joueur confirme vouloir jouer, une boucle est déclenchée:
+	\begin{enumerate}
+		\item affichage de la grille
+		\item input des coordonnées
+		\item envoi des coordonnées
+		\item réception de la réponse\\
+	\end{enumerate}
+	
+\section*{Le serveur}
+	Le serveur s'en occupe de gérer les parties des plusieurs clients. Pour chaque client qui se connecte, le serveur va ouvrir un socket dédié et faire un fork, pour pouvoir gérer les autres pétitions en même temps.\\
+	
+	
+\end{document}
