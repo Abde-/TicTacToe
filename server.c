@@ -238,6 +238,9 @@ int main(void){
                 
                 }
             }
+            else{
+                if (send(new_fd, "1", 1, 0) == -1) perror("send");
+            }
             printf("connection with %s finished.\n",inet_ntoa(their_addr.sin_addr));
             exit(0);
         

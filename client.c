@@ -16,7 +16,7 @@ void printGrid(char v[]){
 	int i;
     for(i = 0; i < LENGTH; ++i){
     	printf("%c",v[i+1]);
-    	if (i % 3 == 2) printf("%d\n",i/3);
+    	if (i % 3 == 2) printf(" %d\n",i/3);
     }
     for(i = 0; i < 3; ++i) printf("%d",i);
     printf("\n");
@@ -27,6 +27,7 @@ int main(int argc, char *argv[]){
     char buf[MAXDATASIZE];
     char inp;
     int temp; 
+    int play = 0;
 
     const char *messages[3] = { "La partie continue:\n", "Vous avez gagné!\n","Vous avez perdu!\n" };
     
@@ -49,10 +50,10 @@ int main(int argc, char *argv[]){
         exit(1);
     }
 
-    their_addr.sin_family = AF_INET;    // host byte order 
-    their_addr.sin_port = htons(PORT);  // short, network byte order 
+    their_addr.sin_family = AF_INET;    // host byte order
+    their_addr.sin_port = htons(PORT);  // short, network byte order
     their_addr.sin_addr = *((struct in_addr *)he->h_addr);
-    memset(&(their_addr.sin_zero), '\0', 8);  // zero the rest of the struct 
+    memset(&(their_addr.sin_zero), '\0', 8);  // zero the rest of the struct
 
     if (connect(sockfd, (struct sockaddr *)&their_addr, sizeof(struct sockaddr)) == -1) {
         perror("Cannot connect to game server");
@@ -77,11 +78,9 @@ int main(int argc, char *argv[]){
 
     buf[numbytes] = '\0';
 
-    buf[0] = '0';
-
     // partie se finit ssi cas 1,2,3 du ending dans server
     while(buf[0] == '0' || buf[0] == '4'){
-
+    	play = 1;
     	printGrid(buf);
     	printf("%s",buf+LENGTH+1);
 
@@ -100,7 +99,7 @@ int main(int argc, char *argv[]){
         }
         inp += temp;
 
-        printf("\n");        
+        printf("\n");
     	
         if (send(sockfd, &inp, 1, 0) == -1) perror("send");
     	if ((numbytes=recv(sockfd, buf, MAXDATASIZE-1, 0)) == -1){
@@ -109,10 +108,12 @@ int main(int argc, char *argv[]){
     	buf[numbytes] = '\0';
     }
 
-    //affichage grid et resultat final
-    printGrid(buf);
-    printf("%s",buf+LENGTH+1);
-
+    if (play){
+    	//affichage grid et resultat final
+    	printGrid(buf);
+    	printf("%s",buf+LENGTH+1);
+    }
+    
     close(sockfd);
 
     return 0;
