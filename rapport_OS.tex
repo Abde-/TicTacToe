@@ -20,7 +20,7 @@
 \begin{itemize}
 	\item 1 bit de vérification
 	\item 9 bits représentant la grille 
-	\item (?) bits représentant le message personnalisé (ex. partie finie, etc)\\
+	\item (?) bits représentant le message personnalisé (ex. partie finie, etc)
 \end{itemize}	
 Par exemple:
 	\begin{verbatim}
@@ -36,11 +36,21 @@ Par exemple:
 		\item affichage de la grille
 		\item input des coordonnées
 		\item envoi des coordonnées
-		\item réception de la réponse\\
+		\item réception de la réponse
 	\end{enumerate}
 	
 \section*{Le serveur}
 	Le serveur s'en occupe de gérer les parties des plusieurs clients. Pour chaque client qui se connecte, le serveur va ouvrir un socket dédié et faire un fork, pour pouvoir gérer les autres pétitions en même temps.\\
 	
+	Après le fork, on vérifie que le joueur veut bien jouer avec un premier <<receive>> et une boucle est déclenchée:
+	\begin{enumerate}
+		\item réception du choix du joueur
+		\item vérification que le choix est valide (c'est-à-dire, que la case ne soit pas occupée)
+		\item mise à jour de la grille et vérification que le joueur a gagné
+		\item mise à jour de la grille avec le choix de du serveur (random) et vérification si le serveur a gagné
+		\item envoi du message avec le protocole
+	\end{enumerate}
+	
+	Les coordonnées du client sont recues en tant que string, et elle sera traduite par le serveur avec un calcul, pour ainsi pouvoir l'utiliser.
 	
 \end{document}
