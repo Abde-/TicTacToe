@@ -27,11 +27,8 @@ int main(int argc, char *argv[]){
     char buf[MAXDATASIZE];
     char inp;
     int temp; 
-    int play = 0;
+    int play = 0; // bool si joueur joue ou pas
 
-    const char *messages[3] = { "La partie continue:\n", "Vous avez gagné!\n","Vous avez perdu!\n" };
-    
-    char message[MAXDATASIZE];
     struct hostent *he;
     struct sockaddr_in their_addr; // connector's address information 
 
@@ -113,7 +110,7 @@ int main(int argc, char *argv[]){
     	printGrid(buf);
     	printf("%s",buf+LENGTH+1);
     }
-    
+
     close(sockfd);
 
     return 0;
